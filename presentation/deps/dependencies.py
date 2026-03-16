@@ -8,6 +8,7 @@ from domain.repos.tasks.TaskRepository import TaskRepository
 from domain.usecases.auth.LogUserInUseCase import LogUserInUseCase
 from domain.usecases.auth.RegisterUserUseCase import RegisterUserUseCase
 from domain.usecases.tasks.AddTaskUseCase import AddTaskUseCase
+from domain.usecases.tasks.GetTasksUseCase import GetTasksUseCase
 
 
 def get_user_repo(db = Depends(getdb)):
@@ -27,3 +28,5 @@ def log_in_use_case(repo = Depends(get_user_repo) , token_repo = Depends(get_tok
 
 def add_task_use_case(repo = Depends(get_task_repo)):
     return AddTaskUseCase(repo)
+def get_tasks_use_case(repo = Depends(get_task_repo)):
+    return GetTasksUseCase(repo)

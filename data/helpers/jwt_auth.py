@@ -1,4 +1,6 @@
 import time
+from typing import Optional
+
 from fastapi import HTTPException , Request
 from jose import jwt, JWTError
 
@@ -20,27 +22,42 @@ def create_access_token(data: dict):
 def create_refresh_token(data: dict):
     to_encode = data.copy()
     to_encode.update({
-        "type": "refresh"  # no expiry
+        "type": "refresh"
     })
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def verify_token(request: Request):
-    auth_header = request.headers.get("Authorization")
-
-    if not auth_header:
+def verify_token(token : Optional[str] , token_with_scheme : Optional[str] , token_type : str = "access"):
+    if not token and not token_with_scheme:
         raise HTTPException(status_code=401, detail="Token missing")
+    if token_with_scheme and not token:
+        try:
+            scheme, token = token_with_scheme.split(" ")
+            if scheme.lower() != "bearer":
+                raise HTTPException(status_code=401, detail="Invalid auth scheme")
 
-    try:
-        scheme, token = auth_header.split(" ")
-        if scheme.lower() != "bearer":
-            raise HTTPException(status_code=401, detail="Invalid auth scheme")
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            if payload.get("type") != token_type:
+                raise HTTPException(status_code=401, detail="Invalid token type")
 
-        if payload.get("type") != "access":
-            raise HTTPException(status_code=401, detail="Invalid token type")
+            return payload  # contains sub, exp, etc.
 
-        return payload  # contains sub, exp, etc.
+        except JWTError:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
 
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    elif token and not token_with_scheme:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+            if payload.get("type") != token_type:
+                raise HTTPException(status_code=401, detail="Invalid token type")
+
+            return payload  # contains sub, exp, etc.
+
+        except JWTError:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return None
+
+
+
+

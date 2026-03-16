@@ -1,9 +1,11 @@
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from data.helpers.exceptions import RepoException
 from data.models.task_model import Task
 from domain.repos.tasks.TaskRepository import TaskRepository
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
 
 class TaskRepositoryImpl(TaskRepository):
     def __init__(self , db):
@@ -23,3 +25,14 @@ class TaskRepositoryImpl(TaskRepository):
             print(e)
             raise RepoException(str(e))
 
+    async def get_task_from_db(self , user_id : str):
+        db = self.db
+        try:
+            result = await db.execute(
+                select(Task).where(
+                    Task.user_id == user_id
+                )
+            )
+            return result.scalar_one_or_none()
+        except SQLAlchemyError as e:
+            raise RepoException(str(e))

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends, Body, HTTPException
+from fastapi import FastAPI, APIRouter, Depends, Body, HTTPException , Response
 from starlette.responses import JSONResponse
 
 from data.helpers.exceptions import UseCaseException
@@ -11,10 +11,25 @@ from presentation.deps.dependencies import get_auth_use_case, log_in_use_case
 auth_router = APIRouter()
 
 @auth_router.post("/sign_up")
-async def sign_up(req : Sign_Up_Request = Body(...), usecase : RegisterUserUseCase = Depends(get_auth_use_case)):
+async def sign_up(response : Response , req : Sign_Up_Request = Body(...), usecase : RegisterUserUseCase = Depends(get_auth_use_case)):
    user = User(name = req.name , email=req.email , password=req.password, profile="")
    try:
        tokens = await usecase.execute(user)
+       response.set_cookie(
+           key="access_token" ,
+           value=tokens[0] ,
+           httponly=True ,
+           secure=False ,
+           samesite="lax",
+           max_age = 60 * 30
+       )
+       response.set_cookie(
+           key="refresh_token" ,
+           value=tokens[1] ,
+           httponly=True ,
+           secure=False ,
+           samesite="lax"
+       )
        return JSONResponse(status_code=200 , content={
                 "accessToken" : tokens[0] ,
                 "refreshToken" : tokens[1] ,
@@ -25,9 +40,24 @@ async def sign_up(req : Sign_Up_Request = Body(...), usecase : RegisterUserUseCa
        return HTTPException(status_code=500, detail=str(e))
 
 @auth_router.post("/sign_in")
-async def sign_in(req : Sign_In_Request = Body(...) ,  usecase : LogUserInUseCase = Depends(log_in_use_case)):
+async def sign_in(response : Response ,  req : Sign_In_Request = Body(...) ,  usecase : LogUserInUseCase = Depends(log_in_use_case)):
    try:
        tokens = await usecase.execute(req.email , req.password)
+       response.set_cookie(
+           key="access_token",
+           value=tokens[0],
+           httponly=True,
+           secure=False,
+           samesite="lax",
+           max_age=60 * 30
+       )
+       response.set_cookie(
+           key="refresh_token",
+           value=tokens[1],
+           httponly=True,
+           secure=False,
+           samesite="lax"
+       )
        return JSONResponse(status_code=200 , content={
            "accessToken" : tokens[0] ,
            "refreshToken" : tokens[1] ,
@@ -38,3 +68,6 @@ async def sign_in(req : Sign_In_Request = Body(...) ,  usecase : LogUserInUseCas
    except Exception as e:
        print(e)
        raise HTTPException(status_code=500, detail=str(e))
+
+
+

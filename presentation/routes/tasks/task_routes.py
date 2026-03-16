@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from data.helpers.exceptions import UseCaseException
 from data.schemas.task_schema import TaskDTO
 from domain.usecases.tasks.AddTaskUseCase import AddTaskUseCase
-from presentation.deps.dependencies import add_task_use_case
+from domain.usecases.tasks.GetTasksUseCase import GetTasksUseCase
+from presentation.deps.dependencies import add_task_use_case, get_tasks_use_case
 
 task_router = APIRouter()
 
@@ -15,3 +16,14 @@ async def add_task(task_dto : TaskDTO , usecase : AddTaskUseCase = Depends(add_t
        raise HTTPException(status_code=500 , detail= str(e))
    except Exception as e:
        raise HTTPException(status_code=500 , detail=str(e))
+
+
+@task_router.get("/get_tasks")
+async def get_tasks(user_id : str , usecase : GetTasksUseCase = Depends(get_tasks_use_case)):
+    try:
+        return usecase.execute(user_id)
+    except UseCaseException as e:
+        raise HTTPException(status_code=500 , detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500 , detail=str(e))
+
