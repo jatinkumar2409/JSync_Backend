@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import delete
 
 from data.helpers.exceptions import RepoException
@@ -12,6 +14,7 @@ class TokenRepositoryImpl(TokenRepository):
         self.db = db
     async def save_session(self , user : dict):
         try:
+            user["duc"] = str(uuid.uuid4())
             token = create_refresh_token(user)
             session = Session(id = token , user_id = user["id"])
             self.db.add(session)
@@ -19,6 +22,7 @@ class TokenRepositoryImpl(TokenRepository):
             await self.db.refresh(session)
             return session
         except IntegrityError as e:
+            print(e)
             await self.db.rollback()
             raise RepoException(str(e))
         except SQLAlchemyError as e:

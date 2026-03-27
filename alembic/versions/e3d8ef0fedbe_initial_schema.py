@@ -1,8 +1,8 @@
-"""create tasks table
+"""initial schema
 
-Revision ID: 6018ae088d39
-Revises: b95829399d84
-Create Date: 2026-03-13 00:06:02.351536
+Revision ID: e3d8ef0fedbe
+Revises: 
+Create Date: 2026-03-25 11:07:17.801950
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '6018ae088d39'
-down_revision: Union[str, Sequence[str], None] = 'b95829399d84'
+revision: str = 'e3d8ef0fedbe'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -31,6 +31,7 @@ def upgrade() -> None:
     sa.Column('has_done', sa.Boolean(), nullable=True),
     sa.Column('tags', sa.String(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('is_deleted', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )

@@ -12,4 +12,4 @@ class TaskDTO(BaseModel):
     priority : int
     hasDone : bool
     tags : str
-    updatedAt : int
+    updatedAt : int = 0
