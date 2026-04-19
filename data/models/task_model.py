@@ -13,5 +13,7 @@ class Task(Base):
     has_done = Column(Boolean , default=False)
     tags = Column(String , nullable= False)
     updated_at = Column(DateTime, default=datetime.utcnow , onupdate=datetime.utcnow , index=True)
+    belongs_to_date = Column(DateTime , default=datetime.utcnow , index=True)
+    expiry_time = Column(DateTime , nullable=True)
     is_deleted = Column(Boolean , default=False)
     user = relationship("User")

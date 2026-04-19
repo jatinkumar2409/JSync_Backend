@@ -13,3 +13,6 @@ class TaskDTO(BaseModel):
     hasDone : bool
     tags : str
     updatedAt : int = 0
+    belongsToDate : int = 0
+    expiryTime : Optional[int] = None
+    isDeleted : bool = False

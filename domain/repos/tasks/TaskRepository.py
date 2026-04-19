@@ -14,5 +14,5 @@ class TaskRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete_task_from_db(self , task_id : str):
+    async def delete_task_simulation(self , task_id : str):
         pass

@@ -8,6 +8,7 @@ from data.helpers.db import Base
 from data.models.user_model import User
 from data.models.session_model import Session
 from data.models.task_model import Task
+from data.models.task_completion_model import TaskCompletion
 from dotenv import load_dotenv
 import os
 

@@ -15,5 +15,5 @@ class ConnectionRepository(ABC):
         pass
 
     @abstractmethod
-    async def send_message(self  , websocket, user_id, message , add_task_use_case , update_task_use_case , delete_task_use_case):
+    async def send_message(self  , websocket, user_id, message , add_task_use_case , update_task_use_case , delete_task_use_case , add_task_completion_use_case , delete_task_completion_use_case):
         pass

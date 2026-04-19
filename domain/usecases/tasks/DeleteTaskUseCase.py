@@ -8,7 +8,7 @@ class DeleteTaskUseCase:
 
     async def execute(self ,task_id : str):
         try:
-            await self.repo.delete_task_from_db(task_id)
+            await self.repo.delete_task_simulation(task_id)
         except RepoException as e:
             raise UseCaseException(str(e))
         except Exception as e:
